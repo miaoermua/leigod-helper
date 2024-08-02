@@ -1,19 +1,26 @@
-#!/bin/bash
+#!/bin/sh
+# https://github.com/isecret/leigod-helper/blob/main/leigod-helper.sh
 
 # 手机号
-USERNAME="18866668888"
+USERNAME="phone"
 # 密码
 PASSWORD="password"
 
 if ! command -v "jq" > /dev/null; then
-    echo "缺失 jq 依赖，请执行命令手动安装";
-    echo "Ubuntu: sudo apt-get install -y jq"
-    echo "CentOS: sudo yum install -y jq"
-    echo "MacOS: sudo brew install -y jq"
+    echo "缺失 jq 依赖";
     exit;
 fi
 
-password_hash=$(echo -n "$PASSWORD" | md5)
+# Calculate MD5 hash
+if command -v md5sum > /dev/null; then
+    password_hash=$(echo -n "$PASSWORD" | md5sum | awk '{print $1}')
+elif command -v md5 > /dev/null; then
+    password_hash=$(echo -n "$PASSWORD" | md5)
+else
+    echo "缺失 md5 或 md5sum 依赖，请手动安装"
+    exit 1
+fi
+
 login=$(curl -Lks -X POST https://webapi.leigod.com/api/auth/login \
     -H 'content-type: application/json' \
     -d "{
@@ -26,8 +33,10 @@ login=$(curl -Lks -X POST https://webapi.leigod.com/api/auth/login \
         \"user_type\": \"0\",
         \"username\": \"$USERNAME\"
     }")
+
 login_code=$(echo $login | jq -r ".code" 2>&1)
 login_msg=$(echo $login | jq -r ".msg" 2>&1)
+
 if [ "$login_code" -eq 0 ]; then
     account_token=$(echo $login | jq -r ".data.login_info.account_token" 2>&1)
     pause=$(curl -Lks -X POST https://webapi.leigod.com/api/user/pause \
