@@ -1,8 +1,8 @@
 #!/bin/sh
 # https://github.com/isecret/leigod-helper/blob/main/leigod-helper.sh
 
-USERNAME="phone"
-PASSWORD="password"
+USERNAME="${USERNAME:-phone}"
+PASSWORD="${PASSWORD:-password}"
 
 if ! command -v "jq" > /dev/null; then
     echo "缺失 jq 依赖";
