@@ -1,9 +1,7 @@
 #!/bin/sh
 # https://github.com/isecret/leigod-helper/blob/main/leigod-helper.sh
 
-# 手机号
 USERNAME="phone"
-# 密码
 PASSWORD="password"
 
 if ! command -v "jq" > /dev/null; then
@@ -11,7 +9,6 @@ if ! command -v "jq" > /dev/null; then
     exit;
 fi
 
-# Calculate MD5 hash
 if command -v md5sum > /dev/null; then
     password_hash=$(echo -n "$PASSWORD" | md5sum | awk '{print $1}')
 elif command -v md5 > /dev/null; then
